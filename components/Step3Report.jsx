@@ -168,10 +168,20 @@ export default function Step3Report({ state, update }) {
 
         {/* Edad gestacional */}
         {r.edadGestacional && (
-          <div className="mb-3 text-sm">
-            <span className="font-semibold text-gray-700">Edad gestacional:</span>{" "}
-            <span className="font-bold text-gray-900">{r.edadGestacional}</span>
-            {r.fpp && <span className="text-gray-700"> · Fecha probable de parto: <strong>{r.fpp}</strong></span>}
+          <div className="mb-3">
+            <div className="text-sm">
+              <span className="font-semibold text-gray-700">Edad gestacional:</span>{" "}
+              <span className="font-bold text-gray-900">{r.edadGestacional}</span>
+              {r.egFuente && <span className="text-gray-500"> ({r.egFuente.replace(/\.$/, "")})</span>}
+            </div>
+            {r.fpp && (
+              <div className="text-sm text-gray-700">Semana 40 (fecha probable de parto): <strong>{r.fpp}</strong></div>
+            )}
+            {r.egHitos.map((hk, i) => (
+              <div key={i} className="text-sm text-gray-600">
+                {hk.label}: <span className="font-medium">{hk.value}</span>
+              </div>
+            ))}
           </div>
         )}
 

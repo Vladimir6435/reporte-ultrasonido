@@ -6,7 +6,9 @@ import { ENCABEZADO } from "@/lib/constants";
 import Step1History from "@/components/Step1History";
 import Step2Study from "@/components/Step2Study";
 import Step3Report from "@/components/Step3Report";
+import GestCalculator from "@/components/GestCalculator";
 import { Button } from "@/components/ui";
+import { computeEG } from "@/lib/calculations";
 
 const STEPS = [
   { n: 1, label: "Historia clínica" },
@@ -16,8 +18,11 @@ const STEPS = [
 
 export default function Home() {
   const [state, setState] = useState(initialState);
+  const [calcOpen, setCalcOpen] = useState(false);
   const update = (patch) => setState((s) => ({ ...s, ...patch }));
   const goto = (n) => update({ step: n });
+
+  const egRes = state.egCalc.activo ? computeEG(state.egCalc, state.fechaReporte) : null;
 
   const canNext =
     state.step === 1
@@ -30,11 +35,29 @@ export default function Home() {
     <main className="mx-auto max-w-4xl px-4 py-6">
       {/* Encabezado de la app */}
       <header className="no-print mb-6 rounded-2xl bg-gradient-to-r from-brand-700 to-brand-600 px-6 py-5 text-white shadow">
-        <h1 className="text-xl font-bold">{ENCABEZADO.titulo}</h1>
-        <p className="text-sm text-brand-100">
-          {ENCABEZADO.medico} · {ENCABEZADO.especialidad1} · {ENCABEZADO.especialidad2} · {ENCABEZADO.lugar}
-        </p>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h1 className="text-xl font-bold">{ENCABEZADO.titulo}</h1>
+            <p className="text-sm text-brand-100">
+              {ENCABEZADO.medico} · {ENCABEZADO.especialidad1} · {ENCABEZADO.especialidad2} · {ENCABEZADO.lugar}
+            </p>
+          </div>
+          <button
+            onClick={() => setCalcOpen(true)}
+            className="rounded-lg bg-white/15 px-4 py-2 text-sm font-semibold backdrop-blur transition hover:bg-white/25"
+          >
+            🧮 Calculadora EG
+          </button>
+        </div>
+        {egRes && egRes.ok && (
+          <div className="mt-3 rounded-lg bg-white/15 px-4 py-2 text-sm">
+            Edad gestacional activa: <strong>{egRes.egTexto}</strong>{" "}
+            <span className="text-brand-100">(por {egRes.metodoLabel})</span> · FPP {egRes.fppStr}
+          </div>
+        )}
       </header>
+
+      {calcOpen && <GestCalculator state={state} update={update} onClose={() => setCalcOpen(false)} />}
 
       {/* Stepper */}
       <nav className="no-print mb-6 flex items-center justify-between gap-2">
