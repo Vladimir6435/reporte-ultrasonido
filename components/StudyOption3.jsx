@@ -17,7 +17,7 @@ export default function StudyOption3({ state, update }) {
 
   return (
     <div>
-      <Section title="Evaluación anatómica (22–24 semanas)" accent
+      <Section title="Evaluación anatómica (22–26 semanas)" accent
         subtitle="Marque cada estructura. Si es anormal, describa el hallazgo.">
         <div className="space-y-3">
           {ANATOMIA_22_24.map((a) => {

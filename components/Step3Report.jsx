@@ -143,6 +143,15 @@ export default function Step3Report({ state, update }) {
           <div className="text-sm"><span className="font-semibold text-gray-700">Paciente:</span> {r.paciente.nombre}</div>
           <div className="text-sm"><span className="font-semibold text-gray-700">Expediente:</span> {r.paciente.identificacion}</div>
           <div className="text-sm"><span className="font-semibold text-gray-700">Edad:</span> {r.paciente.edad}</div>
+          {r.paciente.fechaNacimiento && (
+            <div className="text-sm"><span className="font-semibold text-gray-700">Fecha de nacimiento:</span> {r.paciente.fechaNacimiento}</div>
+          )}
+          {r.paciente.pesoMaterno && (
+            <div className="text-sm"><span className="font-semibold text-gray-700">Peso materno:</span> {r.paciente.pesoMaterno}</div>
+          )}
+          {r.paciente.presionArterial && (
+            <div className="text-sm"><span className="font-semibold text-gray-700">Presión arterial:</span> {r.paciente.presionArterial}</div>
+          )}
         </div>
 
         {/* Antecedentes */}

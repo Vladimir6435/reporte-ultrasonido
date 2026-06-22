@@ -24,8 +24,17 @@ export default function Step1History({ state, update }) {
           <Field label="Identificación / Expediente">
             <TextField value={h.identificacion} onChange={(v) => setH({ identificacion: v })} placeholder="Cédula o número de expediente" />
           </Field>
+          <Field label="Fecha de nacimiento">
+            <TextField type="date" value={h.fechaNacimiento} onChange={(v) => setH({ fechaNacimiento: v })} />
+          </Field>
           <Field label="Edad (años)">
             <TextField type="number" value={h.edad} onChange={(v) => setH({ edad: v })} placeholder="Ej. 32" />
+          </Field>
+          <Field label="Peso materno" hint="Al momento del ultrasonido.">
+            <TextField type="number" value={h.pesoMaterno} onChange={(v) => setH({ pesoMaterno: v })} suffix="kg" placeholder="Ej. 68" />
+          </Field>
+          <Field label="Presión arterial" hint="Al momento del ultrasonido.">
+            <TextField value={h.presionArterial} onChange={(v) => setH({ presionArterial: v })} suffix="mmHg" placeholder="Ej. 120/80" />
           </Field>
         </Grid>
       </Section>
