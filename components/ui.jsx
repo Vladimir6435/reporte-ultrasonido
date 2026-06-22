@@ -156,6 +156,51 @@ export function Measurement({
   );
 }
 
+/** Selector de fecha por día / mes / año (genera "AAAA-MM-DD"). */
+export function DateSelect({ value, onChange, yearStart = 1950, yearEnd }) {
+  const now = new Date();
+  const yEnd = yearEnd || now.getFullYear();
+  const parts = (value || "").split("-");
+  const y = parts[0] || "";
+  const m = parts[1] ? String(Number(parts[1])) : "";
+  const d = parts[2] ? String(Number(parts[2])) : "";
+
+  const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+  const years = [];
+  for (let i = yEnd; i >= yearStart; i--) years.push(i);
+
+  const emit = (yy, mm, dd) => {
+    const Y = yy || "";
+    const M = mm ? String(mm).padStart(2, "0") : "";
+    const D = dd ? String(dd).padStart(2, "0") : "";
+    onChange(`${Y}-${M}-${D}`);
+  };
+  const sel = "rounded-lg border border-gray-300 px-2 py-2 text-sm focus:border-brand-600 focus:ring-2 focus:ring-brand-100";
+
+  return (
+    <div className="flex gap-2">
+      <select className={sel} value={d} onChange={(e) => emit(y, m, e.target.value)}>
+        <option value="">Día</option>
+        {Array.from({ length: 31 }, (_, i) => i + 1).map((n) => (
+          <option key={n} value={n}>{n}</option>
+        ))}
+      </select>
+      <select className={`${sel} flex-1`} value={m} onChange={(e) => emit(y, e.target.value, d)}>
+        <option value="">Mes</option>
+        {meses.map((mn, i) => (
+          <option key={i} value={i + 1}>{mn}</option>
+        ))}
+      </select>
+      <select className={sel} value={y} onChange={(e) => emit(e.target.value, m, d)}>
+        <option value="">Año</option>
+        {years.map((yr) => (
+          <option key={yr} value={yr}>{yr}</option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
 export function Button({ children, onClick, variant = "primary", disabled, className = "" }) {
   const styles = {
     primary: "bg-brand-600 text-white hover:bg-brand-700",

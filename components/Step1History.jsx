@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  Section, Field, TextField, TextArea, Segmented, YesNo, Checkbox, Grid,
+  Section, Field, TextField, TextArea, Segmented, YesNo, Checkbox, Grid, DateSelect,
 } from "./ui";
 import { calcEDD, formatDate, ageFromDOB } from "@/lib/calculations";
 
@@ -31,7 +31,7 @@ export default function Step1History({ state, update }) {
             <TextField value={h.identificacion} onChange={(v) => setH({ identificacion: v })} placeholder="Cédula o número de expediente" />
           </Field>
           <Field label="Fecha de nacimiento" hint="Calcula la edad automáticamente.">
-            <TextField type="date" value={h.fechaNacimiento} onChange={onFechaNacimiento} />
+            <DateSelect value={h.fechaNacimiento} onChange={onFechaNacimiento} yearStart={1950} />
           </Field>
           <Field label="Edad (años)" hint="Edad al día del ultrasonido.">
             <TextField type="number" value={h.edad} onChange={(v) => setH({ edad: v })} placeholder="Ej. 32" />
