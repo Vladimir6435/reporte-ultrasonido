@@ -49,7 +49,14 @@ export default function Step1History({ state, update }) {
         <Grid cols={2}>
           <Field label="Hipertensión arterial crónica">
             <YesNo value={h.htaCronica} onChange={(v) => setH({ htaCronica: v })} />
+            {h.htaCronica === "si" && (
+              <div className="mt-2 space-y-2">
+                <TextField value={h.htaTiempo} onChange={(v) => setH({ htaTiempo: v })} placeholder="¿Hace cuánto tiempo? (Ej. 4 años)" />
+                <TextField value={h.htaTratamiento} onChange={(v) => setH({ htaTratamiento: v })} placeholder="Tratamiento actual" />
+              </div>
+            )}
           </Field>
+
           <Field label="Diabetes">
             <Segmented
               value={h.diabetes}
@@ -61,29 +68,76 @@ export default function Step1History({ state, update }) {
                 { value: "gestacional", label: "Gestacional" },
               ]}
             />
-          </Field>
-          <Field label="Enfermedad del colágeno / autoinmune">
-            <YesNo value={h.colageno} onChange={(v) => setH({ colageno: v })} />
-            {h.colageno === "si" && (
-              <div className="mt-2">
-                <TextField value={h.colagenoCual} onChange={(v) => setH({ colagenoCual: v })} placeholder="¿Cuál? (LES, SAF, etc.)" />
-              </div>
-            )}
-          </Field>
-          <Field label="¿Toma medicamentos?">
-            <YesNo value={h.medicamentos} onChange={(v) => setH({ medicamentos: v })} />
-            {h.medicamentos === "si" && (
+            {h.diabetes !== "no" && (
               <div className="mt-2 space-y-2">
-                <Checkbox
-                  checked={h.antiepilepticos}
-                  onChange={(v) => setH({ antiepilepticos: v })}
-                  label="Antiepilépticos"
-                />
-                <TextField value={h.medicamentosLista} onChange={(v) => setH({ medicamentosLista: v })} placeholder="Detalle de medicamentos" />
+                <TextField value={h.dmTiempo} onChange={(v) => setH({ dmTiempo: v })} placeholder="¿Hace cuánto tiempo? (Ej. 6 años)" />
+                <TextField value={h.dmTratamiento} onChange={(v) => setH({ dmTratamiento: v })} placeholder="Tratamiento actual" />
               </div>
             )}
           </Field>
         </Grid>
+
+        <Field label="Enfermedad del colágeno / autoinmune">
+          <YesNo value={h.colageno} onChange={(v) => setH({ colageno: v })} />
+          {h.colageno === "si" && (
+            <div className="mt-3 space-y-2 rounded-lg bg-gray-50 p-4">
+              <p className="text-xs text-gray-500">Seleccione la(s) que aplique(n):</p>
+              <Checkbox checked={h.colagenoLes} onChange={(v) => setH({ colagenoLes: v })} label="Lupus eritematoso sistémico" />
+              <Checkbox checked={h.colagenoSjogren} onChange={(v) => setH({ colagenoSjogren: v })} label="Síndrome de Sjögren" />
+              <Checkbox checked={h.colagenoArtritis} onChange={(v) => setH({ colagenoArtritis: v })} label="Artritis reumatoide" />
+              <Checkbox checked={h.colagenoOtro} onChange={(v) => setH({ colagenoOtro: v })} label="Otra" />
+              {h.colagenoOtro && (
+                <TextField value={h.colagenoOtroCual} onChange={(v) => setH({ colagenoOtroCual: v })} placeholder="¿Cuál?" />
+              )}
+              <TextField value={h.colagenoMedicamentos} onChange={(v) => setH({ colagenoMedicamentos: v })} placeholder="Medicamentos para la enfermedad del colágeno" />
+            </div>
+          )}
+        </Field>
+
+        <Grid cols={2}>
+          <Field label="Síndrome de anticuerpos antifosfolípidos">
+            <YesNo value={h.saf} onChange={(v) => setH({ saf: v })} />
+            {h.saf === "si" && (
+              <div className="mt-2">
+                <TextArea value={h.safEventos} onChange={(v) => setH({ safEventos: v })} rows={3}
+                  placeholder="Eventos obstétricos o trombóticos previos" />
+              </div>
+            )}
+          </Field>
+
+          <Field label="Trombofilias">
+            <YesNo value={h.trombofilia} onChange={(v) => setH({ trombofilia: v })} />
+            {h.trombofilia === "si" && (
+              <div className="mt-2 space-y-2 rounded-lg bg-gray-50 p-4">
+                <p className="text-xs text-gray-500">Marque la(s) presente(s):</p>
+                <Checkbox checked={h.tromboFactorVLeiden} onChange={(v) => setH({ tromboFactorVLeiden: v })} label="Factor V de Leiden" />
+                <Checkbox checked={h.tromboProtrombina} onChange={(v) => setH({ tromboProtrombina: v })} label="Mutación de protrombina G20210A" />
+                <Checkbox checked={h.tromboAntitrombina} onChange={(v) => setH({ tromboAntitrombina: v })} label="Deficiencia de antitrombina" />
+                <Checkbox checked={h.tromboProteinaC} onChange={(v) => setH({ tromboProteinaC: v })} label="Deficiencia de proteína C" />
+                <Checkbox checked={h.tromboProteinaS} onChange={(v) => setH({ tromboProteinaS: v })} label="Deficiencia de proteína S" />
+                <Checkbox checked={h.tromboOtra} onChange={(v) => setH({ tromboOtra: v })} label="Otra" />
+                {h.tromboOtra && (
+                  <TextField value={h.tromboOtraCual} onChange={(v) => setH({ tromboOtraCual: v })} placeholder="¿Cuál?" />
+                )}
+                <TextField value={h.tromboTratamiento} onChange={(v) => setH({ tromboTratamiento: v })} placeholder="Tratamiento actual" />
+              </div>
+            )}
+          </Field>
+        </Grid>
+
+        <Field label="¿Toma otros medicamentos?">
+          <YesNo value={h.medicamentos} onChange={(v) => setH({ medicamentos: v })} />
+          {h.medicamentos === "si" && (
+            <div className="mt-2 space-y-2">
+              <Checkbox
+                checked={h.antiepilepticos}
+                onChange={(v) => setH({ antiepilepticos: v })}
+                label="Antiepilépticos"
+              />
+              <TextField value={h.medicamentosLista} onChange={(v) => setH({ medicamentosLista: v })} placeholder="Detalle de medicamentos" />
+            </div>
+          )}
+        </Field>
       </Section>
 
       <Section title="Antecedentes obstétricos">
