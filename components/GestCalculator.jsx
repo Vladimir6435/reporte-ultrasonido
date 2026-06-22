@@ -16,7 +16,18 @@ export default function GestCalculator({ state, update, onClose }) {
   const res = computeEG(c, state.fechaReporte);
 
   const aplicar = () => {
-    set({ activo: true });
+    const patch = { egCalc: { ...c, activo: true } };
+    if (res && res.ok) {
+      // Rellena automáticamente la sección de edad gestacional de la etapa 1.
+      patch.historia = {
+        ...state.historia,
+        egConocida: "si",
+        egSemanas: String(res.semanas),
+        egDias: String(res.dias),
+        egFechaRef: state.fechaReporte,
+      };
+    }
+    update(patch);
     onClose();
   };
 

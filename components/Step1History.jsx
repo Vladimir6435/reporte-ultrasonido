@@ -3,11 +3,17 @@
 import {
   Section, Field, TextField, TextArea, Segmented, YesNo, Checkbox, Grid,
 } from "./ui";
-import { calcEDD, formatDate } from "@/lib/calculations";
+import { calcEDD, formatDate, ageFromDOB } from "@/lib/calculations";
 
 export default function Step1History({ state, update }) {
   const h = state.historia;
   const setH = (patch) => update({ historia: { ...h, ...patch } });
+
+  // Al ingresar la fecha de nacimiento, calcula la edad al día del ultrasonido.
+  const onFechaNacimiento = (v) => {
+    const edad = ageFromDOB(v, state.fechaReporte);
+    setH({ fechaNacimiento: v, ...(edad != null ? { edad: String(edad) } : {}) });
+  };
 
   const fppPrevia =
     h.egConocida === "si"
@@ -24,10 +30,10 @@ export default function Step1History({ state, update }) {
           <Field label="Identificación / Expediente">
             <TextField value={h.identificacion} onChange={(v) => setH({ identificacion: v })} placeholder="Cédula o número de expediente" />
           </Field>
-          <Field label="Fecha de nacimiento">
-            <TextField type="date" value={h.fechaNacimiento} onChange={(v) => setH({ fechaNacimiento: v })} />
+          <Field label="Fecha de nacimiento" hint="Calcula la edad automáticamente.">
+            <TextField type="date" value={h.fechaNacimiento} onChange={onFechaNacimiento} />
           </Field>
-          <Field label="Edad (años)">
+          <Field label="Edad (años)" hint="Edad al día del ultrasonido.">
             <TextField type="number" value={h.edad} onChange={(v) => setH({ edad: v })} placeholder="Ej. 32" />
           </Field>
           <Field label="Peso materno" hint="Al momento del ultrasonido.">
