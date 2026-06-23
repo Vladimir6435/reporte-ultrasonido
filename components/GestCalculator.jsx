@@ -1,7 +1,9 @@
 "use client";
 
-import { Field, TextField, Segmented, Button, Grid } from "./ui";
+import { Field, TextField, Segmented, Button, Grid, DateSelect } from "./ui";
 import { computeEG } from "@/lib/calculations";
+
+const YEAR_END = new Date().getFullYear() + 1;
 
 const METODOS = [
   { value: "fur", label: "Última regla" },
@@ -45,14 +47,14 @@ export default function GestCalculator({ state, update, onClose }) {
 
         {c.metodo === "fur" && (
           <Field label="Fecha de última regla">
-            <TextField type="date" value={c.fur} onChange={(v) => set({ fur: v })} />
+            <DateSelect value={c.fur} onChange={(v) => set({ fur: v })} yearStart={2020} yearEnd={YEAR_END} />
           </Field>
         )}
 
         {c.metodo === "us" && (
           <>
             <Field label="Fecha del ultrasonido">
-              <TextField type="date" value={c.usFecha} onChange={(v) => set({ usFecha: v })} />
+              <DateSelect value={c.usFecha} onChange={(v) => set({ usFecha: v })} yearStart={2020} yearEnd={YEAR_END} />
             </Field>
             <Grid cols={2}>
               <Field label="Semanas en el ultrasonido">
@@ -67,7 +69,7 @@ export default function GestCalculator({ state, update, onClose }) {
 
         {c.metodo === "fpp" && (
           <Field label="Fecha probable de parto">
-            <TextField type="date" value={c.fpp} onChange={(v) => set({ fpp: v })} />
+            <DateSelect value={c.fpp} onChange={(v) => set({ fpp: v })} yearStart={2020} yearEnd={YEAR_END} />
           </Field>
         )}
 
