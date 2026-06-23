@@ -1,8 +1,31 @@
 "use client";
 
-import { Section, Field, Measurement, Segmented, Checkbox, Grid } from "./ui";
+import { Section, Field, Measurement, Segmented, Checkbox, Grid, TextField } from "./ui";
 import { UBICACION_PLACENTA, LIQUIDO_AMNIOTICO } from "@/lib/constants";
 import { classifyRCIU } from "@/lib/calculations";
+
+// Fila de Doppler con dos casillas: IP y percentil, más "no se requiere".
+function DopplerRow({ label, ip, onIp, p, onP, nm, onNm, extra }) {
+  return (
+    <div className="border-b border-gray-100 py-2">
+      <div className="mb-1 text-sm font-medium text-gray-700">{label}</div>
+      <div className="flex flex-wrap items-center gap-2">
+        <div className="flex items-stretch" style={{ maxWidth: "150px" }}>
+          <input type="text" disabled={nm} value={nm ? "" : ip ?? ""} onChange={(e) => onIp(e.target.value)}
+            placeholder="IP" className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-brand-600 focus:ring-2 focus:ring-brand-100 disabled:bg-gray-100" />
+          <span className="ml-1 flex items-center text-xs text-gray-500">IP</span>
+        </div>
+        <div className="flex items-stretch" style={{ maxWidth: "150px" }}>
+          <input type="text" disabled={nm} value={nm ? "" : p ?? ""} onChange={(e) => onP(e.target.value)}
+            placeholder="percentil" className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-brand-600 focus:ring-2 focus:ring-brand-100 disabled:bg-gray-100" />
+          <span className="ml-1 flex items-center text-xs text-gray-500">p</span>
+        </div>
+        <Checkbox checked={nm} onChange={onNm} label="No se requiere" />
+      </div>
+      {extra && <div className="mt-2">{extra}</div>}
+    </div>
+  );
+}
 
 export default function StudyOption4({ state, update }) {
   const o = state.op4;
@@ -16,9 +39,9 @@ export default function StudyOption4({ state, update }) {
         cprPercentil_p5: o.rciu_cpr_p5,
         uterinasPI_p95: o.rciu_uterinasPI_p95,
         umbilicalDiastoleAusente: o.rciu_umbDiastoleAusente,
-        umbilicalDiastoleReversa: o.rciu_umbDiastoleReversa,
+        umbilicalDiastoleReversa: o.rciu_umbDiastoleReversa || o.umbilicalReverso,
         ductusVenosoIP_p95: o.rciu_dvIP_p95,
-        ductusVenosoAReversa: o.rciu_dvAReversa,
+        ductusVenosoAReversa: o.rciu_dvAReversa || o.dvOndaAReversa,
       })
     : null;
 
@@ -47,23 +70,35 @@ export default function StudyOption4({ state, update }) {
         </Grid>
       </Section>
 
-      <Section title="Estudio Doppler" subtitle="Ingrese valor con percentil/MoM, o marque 'No se requiere medición'.">
-        <Grid cols={2}>
-          <Measurement label="Arterias uterinas (IP medio)" value={o.uterinas} onChange={(v) => set({ uterinas: v })} unit="IP / p" inputType="text"
-            noMeasure={o.uterinasNm} onNoMeasure={(v) => set({ uterinasNm: v })} noMeasureLabel="No se requiere" width="260px" />
-          <Measurement label="Arteria umbilical (IP)" value={o.umbilical} onChange={(v) => set({ umbilical: v })} unit="IP / p" inputType="text"
-            noMeasure={o.umbilicalNm} onNoMeasure={(v) => set({ umbilicalNm: v })} noMeasureLabel="No se requiere" width="260px" />
-          <Measurement label="Arteria cerebral media (IP)" value={o.acm} onChange={(v) => set({ acm: v })} unit="IP / p" inputType="text"
-            noMeasure={o.acmNm} onNoMeasure={(v) => set({ acmNm: v })} noMeasureLabel="No se requiere" width="260px" />
-          <Measurement label="Índice cerebro-placentario (ICP)" value={o.icp} onChange={(v) => set({ icp: v })} unit="ratio / p" inputType="text"
-            noMeasure={o.icpNm} onNoMeasure={(v) => set({ icpNm: v })} noMeasureLabel="No se requiere" width="260px" />
-          <Measurement label="Ductus venoso (IP)" value={o.ductusVenoso} onChange={(v) => set({ ductusVenoso: v })} unit="IP / p" inputType="text"
-            noMeasure={o.dvNm} onNoMeasure={(v) => set({ dvNm: v })} noMeasureLabel="No se requiere" width="260px" />
-          <Measurement label="PlGF" value={o.plgf} onChange={(v) => set({ plgf: v })} unit="pg/mL o MoM" inputType="text"
-            noMeasure={o.plgfNm} onNoMeasure={(v) => set({ plgfNm: v })} noMeasureLabel="No se requiere" width="260px" />
-          <Measurement label="sFlt-1" value={o.sflt1} onChange={(v) => set({ sflt1: v })} unit="pg/mL o MoM" inputType="text"
-            noMeasure={o.sflt1Nm} onNoMeasure={(v) => set({ sflt1Nm: v })} noMeasureLabel="No se requiere" width="260px" />
-        </Grid>
+      <Section title="Estudio Doppler" subtitle="Ingrese índice de pulsatilidad (IP) y percentil, o marque 'No se requiere'.">
+        <DopplerRow label="Arterias uterinas (IP medio)"
+          ip={o.uterinas} onIp={(v) => set({ uterinas: v })} p={o.uterinasP} onP={(v) => set({ uterinasP: v })}
+          nm={o.uterinasNm} onNm={(v) => set({ uterinasNm: v })} />
+        <DopplerRow label="Arteria umbilical"
+          ip={o.umbilical} onIp={(v) => set({ umbilical: v })} p={o.umbilicalP} onP={(v) => set({ umbilicalP: v })}
+          nm={o.umbilicalNm} onNm={(v) => set({ umbilicalNm: v })}
+          extra={<Checkbox checked={o.umbilicalReverso} onChange={(v) => set({ umbilicalReverso: v })} label="Flujo diastólico reverso" />} />
+        <DopplerRow label="Arteria cerebral media"
+          ip={o.acm} onIp={(v) => set({ acm: v })} p={o.acmP} onP={(v) => set({ acmP: v })}
+          nm={o.acmNm} onNm={(v) => set({ acmNm: v })} />
+        <DopplerRow label="Índice cerebro-placentario (ICP)"
+          ip={o.icp} onIp={(v) => set({ icp: v })} p={o.icpP} onP={(v) => set({ icpP: v })}
+          nm={o.icpNm} onNm={(v) => set({ icpNm: v })} />
+        <DopplerRow label="Ductus venoso"
+          ip={o.ductusVenoso} onIp={(v) => set({ ductusVenoso: v })} p={o.dvP} onP={(v) => set({ dvP: v })}
+          nm={o.dvNm} onNm={(v) => set({ dvNm: v })}
+          extra={<Checkbox checked={o.dvOndaAReversa} onChange={(v) => set({ dvOndaAReversa: v })} label="Onda a reversa" />} />
+
+        <div className="mt-4">
+          <Grid cols={3}>
+            <Measurement label="PlGF" value={o.plgf} onChange={(v) => set({ plgf: v })} unit="pg/mL o MoM" inputType="text"
+              noMeasure={o.plgfNm} onNoMeasure={(v) => set({ plgfNm: v })} noMeasureLabel="No se requiere" width="200px" />
+            <Measurement label="sFlt-1" value={o.sflt1} onChange={(v) => set({ sflt1: v })} unit="pg/mL o MoM" inputType="text"
+              noMeasure={o.sflt1Nm} onNoMeasure={(v) => set({ sflt1Nm: v })} noMeasureLabel="No se requiere" width="200px" />
+            <Measurement label="Balance angiogénico (sFlt-1/PlGF)" value={o.balanceAngiogenico} onChange={(v) => set({ balanceAngiogenico: v })} unit="cociente" inputType="text"
+              noMeasure={o.balanceNm} onNoMeasure={(v) => set({ balanceNm: v })} noMeasureLabel="No se requiere" width="200px" />
+          </Grid>
+        </div>
       </Section>
 
       <Section title="Clasificación de RCIU — Medicina Fetal Barcelona">

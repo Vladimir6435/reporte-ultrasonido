@@ -159,12 +159,14 @@ export default function Step3Report({ state, update }) {
           <span className="font-semibold text-gray-700">Antecedentes médicos:</span>{" "}
           <span className="text-gray-800">{r.antecedentesMedicos}</span>
         </div>
-        <div className="mb-3 rounded-md bg-gray-50 px-3 py-2 text-sm">
-          <span className="font-bold text-brand-700">Antecedentes obstétricos:</span>{" "}
-          <span className="font-semibold text-gray-800">
-            {r.antecedentesObstetricos.map((x) => `${x.label}: ${x.value}`).join("  ·  ")}
-          </span>
-        </div>
+        {r.antecedentesObstetricos.length > 0 && (
+          <div className="mb-3 rounded-md bg-gray-50 px-3 py-2 text-sm">
+            <span className="font-bold text-brand-700">Antecedentes obstétricos:</span>{" "}
+            <span className="font-semibold text-gray-800">
+              {r.antecedentesObstetricos.map((x) => `${x.label}: ${x.value}`).join("  ·  ")}
+            </span>
+          </div>
+        )}
 
         {/* Edad gestacional */}
         {r.edadGestacional && (
