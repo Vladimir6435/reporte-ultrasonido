@@ -39,6 +39,13 @@ function Blocks({ blocks }) {
               <span className="text-brand-900">{b.value}</span>
             </div>
           );
+        if (b.type === "alert")
+          return (
+            <div key={i} className="mb-2 rounded-md border-l-4 border-red-600 bg-red-50 px-3 py-2 text-sm">
+              <span className="font-bold text-red-700">{b.label}:</span>{" "}
+              <span className="font-semibold text-red-900">{b.value}</span>
+            </div>
+          );
         if (b.type === "note")
           return <p key={i} className="mb-2 text-sm text-gray-700">{b.text}</p>;
         return null;

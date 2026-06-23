@@ -1,6 +1,6 @@
 "use client";
 
-import { Section, Field, Measurement, Segmented, Checkbox, Grid, TextField } from "./ui";
+import { Section, Field, Measurement, Segmented, Checkbox, Grid, TextField, TextArea } from "./ui";
 import { UBICACION_PLACENTA, LIQUIDO_AMNIOTICO } from "@/lib/constants";
 import { classifyRCIU } from "@/lib/calculations";
 
@@ -58,8 +58,20 @@ export default function StudyOption4({ state, update }) {
         </Grid>
       </Section>
 
-      <Section title="Placenta y líquido amniótico">
+      <Section title="Presentación, placenta y líquido amniótico">
         <Grid cols={2}>
+          <Field label="Presentación fetal">
+            <Segmented
+              value={o.presentacion}
+              onChange={(v) => set({ presentacion: v })}
+              options={[
+                { value: "cefalico", label: "Cefálico" },
+                { value: "pelvico", label: "Pélvico" },
+                { value: "transverso", label: "Transverso" },
+              ]}
+              size="sm"
+            />
+          </Field>
           <Field label="Ubicación placentaria">
             <Segmented value={o.ubicacionPlacenta} onChange={(v) => set({ ubicacionPlacenta: v })} options={UBICACION_PLACENTA} size="sm" />
           </Field>
@@ -68,6 +80,17 @@ export default function StudyOption4({ state, update }) {
           </Field>
           <Measurement label="ILA / bolsillo mayor (opcional)" value={o.ilaValor} onChange={(v) => set({ ilaValor: v })} unit="cm" inputType="text" />
         </Grid>
+
+        <Field label="Placenta">
+          <Checkbox checked={o.placentaAnormal} onChange={(v) => set({ placentaAnormal: v })} label="Placenta anormal" />
+          {o.placentaAnormal && (
+            <div className="mt-2 space-y-2 rounded-lg border border-red-200 bg-red-50 p-4">
+              <Checkbox checked={o.placentaPrevia} onChange={(v) => set({ placentaPrevia: v })} label="Placenta previa" />
+              <Checkbox checked={o.placentaInsercionAnormal} onChange={(v) => set({ placentaInsercionAnormal: v })} label="Inserción anormal (acretismo / vasa previa)" />
+              <TextArea value={o.placentaDescripcion} onChange={(v) => set({ placentaDescripcion: v })} rows={3} placeholder="Descripción de la anormalidad placentaria" />
+            </div>
+          )}
+        </Field>
       </Section>
 
       <Section title="Estudio Doppler" subtitle="Ingrese índice de pulsatilidad (IP) y percentil, o marque 'No se requiere'.">
