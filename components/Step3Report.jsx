@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Section, TextArea, Button } from "./ui";
+import { Section, TextArea, Button, Field, TextField, Grid } from "./ui";
 import { buildReport, buildNotaMedica } from "@/lib/report";
-import { generateDocx } from "@/lib/docxExport";
+import { generateDocx, nombreArchivo } from "@/lib/docxExport";
 
 function Blocks({ blocks }) {
   return (
@@ -41,10 +41,9 @@ function Blocks({ blocks }) {
           );
         if (b.type === "alert")
           return (
-            <div key={i} className="mb-2 rounded-md border-l-4 border-red-600 bg-red-50 px-3 py-2 text-sm">
-              <span className="font-bold text-red-700">{b.label}:</span>{" "}
-              <span className="font-semibold text-red-900">{b.value}</span>
-            </div>
+            <p key={i} className="mb-2 text-sm text-gray-900">
+              <strong>{b.label}: {b.value}</strong>
+            </p>
           );
         if (b.type === "note")
           return <p key={i} className="mb-2 text-sm text-gray-700">{b.text}</p>;
@@ -72,7 +71,23 @@ export default function Step3Report({ state, update }) {
     }
   };
 
-  const handlePrint = () => window.print();
+  const handlePrint = () => {
+    const prev = document.title;
+    document.title = nombreArchivo(state);
+    window.print();
+    setTimeout(() => { document.title = prev; }, 800);
+  };
+
+  // Personal médico
+  const medicos = state.medicos || [];
+  const selMed = medicos.find((m) => m.id === state.medicoSelId) || medicos[0] || { id: "", nombre: "", especialidades: "" };
+  const updateMedico = (id, patch) =>
+    update({ medicos: medicos.map((m) => (m.id === id ? { ...m, ...patch } : m)) });
+  const addMedico = () => {
+    const id = "m" + Date.now();
+    update({ medicos: [...medicos, { id, nombre: "", especialidades: "" }], medicoSelId: id });
+  };
+  const selectStyle = "w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-brand-600 focus:ring-2 focus:ring-brand-100";
 
   const copyNota = async () => {
     try {
@@ -94,6 +109,26 @@ export default function Step3Report({ state, update }) {
 
   return (
     <div>
+      {/* Profesional que firma */}
+      <Section title="Profesional que firma" subtitle="Seleccione el médico; puede editar sus datos o agregar más personal." accent>
+        <Field label="Médico">
+          <select value={state.medicoSelId} onChange={(e) => update({ medicoSelId: e.target.value })} className={selectStyle}>
+            {medicos.map((m) => (
+              <option key={m.id} value={m.id}>{m.nombre || "(sin nombre)"}</option>
+            ))}
+          </select>
+        </Field>
+        <Grid cols={2}>
+          <Field label="Nombre">
+            <TextField value={selMed.nombre} onChange={(v) => updateMedico(selMed.id, { nombre: v })} placeholder="Nombre del médico" />
+          </Field>
+          <Field label="Especialidades">
+            <TextField value={selMed.especialidades} onChange={(v) => updateMedico(selMed.id, { especialidades: v })} placeholder="Ej. Medicina Fetal · Cardiología Fetal" />
+          </Field>
+        </Grid>
+        <Button variant="secondary" onClick={addMedico}>+ Agregar médico</Button>
+      </Section>
+
       {/* Caja de comentarios (siempre accesible antes de generar) */}
       <Section title="Comentarios" subtitle="Texto libre que aparecerá al final del reporte. Editable en todo momento." accent>
         <TextArea
@@ -120,12 +155,17 @@ export default function Step3Report({ state, update }) {
       {/* Nota médica compacta */}
       {notaOpen && (
         <Section title="Nota médica compacta" subtitle="Lista para copiar al expediente.">
+          <div className="mb-3 flex justify-end">
+            <Button onClick={copyNota}>
+              {copied ? "✓ ¡Copiado!" : "📋 Copiar nota completa"}
+            </Button>
+          </div>
           <pre className="max-h-72 overflow-auto whitespace-pre-wrap rounded-lg bg-gray-900 p-4 text-xs leading-relaxed text-gray-100">
             {nota}
           </pre>
           <div className="mt-3">
             <Button variant="secondary" onClick={copyNota}>
-              {copied ? "¡Copiado!" : "Copiar al portapapeles"}
+              {copied ? "✓ ¡Copiado!" : "Copiar al portapapeles"}
             </Button>
           </div>
         </Section>
@@ -137,9 +177,9 @@ export default function Step3Report({ state, update }) {
         <div className="mb-5 border-b-2 border-brand-600 pb-4 text-center">
           <h1 className="text-xl font-bold text-brand-700">{r.encabezado.titulo}</h1>
           <div className="mt-1 text-base font-semibold text-gray-800">{r.encabezado.medico}</div>
-          <div className="text-sm text-gray-500">
-            {r.encabezado.especialidad1} · {r.encabezado.especialidad2}
-          </div>
+          {r.encabezado.especialidades && (
+            <div className="text-sm text-gray-500">{r.encabezado.especialidades}</div>
+          )}
           <div className="mt-1 text-sm text-gray-500">
             {r.encabezado.lugar} · Fecha de elaboración: {r.fechaReporte}
           </div>
@@ -211,7 +251,7 @@ export default function Step3Report({ state, update }) {
         <div className="mt-10 text-sm">
           <div className="mb-1">_______________________________</div>
           <div className="font-semibold text-gray-800">{r.encabezado.medico}</div>
-          <div className="text-gray-500">{r.encabezado.especialidad1} · {r.encabezado.especialidad2}</div>
+          {r.encabezado.especialidades && <div className="text-gray-500">{r.encabezado.especialidades}</div>}
         </div>
       </div>
     </div>

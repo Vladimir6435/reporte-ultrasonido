@@ -9,6 +9,7 @@ import Step3Report from "@/components/Step3Report";
 import GestCalculator from "@/components/GestCalculator";
 import { Button } from "@/components/ui";
 import { computeEG } from "@/lib/calculations";
+import { getMedico } from "@/lib/report";
 
 const STEPS = [
   { n: 1, label: "Historia clínica" },
@@ -23,6 +24,7 @@ export default function Home() {
   const goto = (n) => update({ step: n });
 
   const egRes = state.egCalc.activo ? computeEG(state.egCalc, state.fechaReporte) : null;
+  const medico = getMedico(state);
 
   const canNext =
     state.step === 1
@@ -39,7 +41,7 @@ export default function Home() {
           <div>
             <h1 className="text-xl font-bold">{ENCABEZADO.titulo}</h1>
             <p className="text-sm text-brand-100">
-              {ENCABEZADO.medico} · {ENCABEZADO.especialidad1} · {ENCABEZADO.especialidad2} · {ENCABEZADO.lugar}
+              {medico.nombre}{medico.especialidades ? ` · ${medico.especialidades}` : ""} · {ENCABEZADO.lugar}
             </p>
           </div>
           <button
