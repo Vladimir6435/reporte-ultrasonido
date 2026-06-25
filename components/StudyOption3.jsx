@@ -61,8 +61,9 @@ export default function StudyOption3({ state, update }) {
         )}
       </Section>
 
-      <Section title="Longitud cervical y placenta">
+      <Section title="Vitalidad, longitud cervical y placenta">
         <Grid cols={2}>
+          <Measurement label="Frecuencia cardíaca fetal" value={o.fcf} onChange={(v) => set({ fcf: v })} unit="lpm" />
           <Measurement label="Longitud cervical" value={o.longitudCervical} onChange={(v) => set({ longitudCervical: v })} unit="mm"
             noMeasure={o.lcNm} onNoMeasure={(v) => set({ lcNm: v })} />
           <Field label="Ubicación placentaria">

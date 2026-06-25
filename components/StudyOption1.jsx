@@ -64,9 +64,21 @@ export default function StudyOption1({ state, update }) {
       </Section>
 
       <Section title="Vitalidad">
-        <Field label="Vesícula vitelina">
-          <Segmented value={o.vesiculaVitelina} onChange={(v) => set({ vesiculaVitelina: v })} options={PRESENTE_AUSENTE_NM} />
-        </Field>
+        <Grid cols={2}>
+          <Measurement label="Vesícula vitelina" value={o.vesiculaVitelina} onChange={(v) => set({ vesiculaVitelina: v })} unit="mm / texto" inputType="text" width="260px" />
+          <Field label="Cuerpo lúteo">
+            <Segmented
+              value={o.cuerpoLuteo}
+              onChange={(v) => set({ cuerpoLuteo: v })}
+              options={[
+                { value: "ovario_izq", label: "Ovario izquierdo" },
+                { value: "ovario_der", label: "Ovario derecho" },
+                { value: "ausente", label: "Ausente" },
+              ]}
+              size="sm"
+            />
+          </Field>
+        </Grid>
         {o.tipoEmbarazo === "unico" ? (
           <Measurement label="Frecuencia cardíaca fetal" value={o.fcf1} onChange={(v) => set({ fcf1: v })} unit="lpm" />
         ) : (

@@ -1,7 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { Field, TextField, Segmented, Button, Grid, DateSelect } from "./ui";
 import { computeEG } from "@/lib/calculations";
+import { buildHitos, buildHitosTexto, printHitos } from "@/lib/hitos";
+import { generateHitosDocx } from "@/lib/docxExport";
 
 const YEAR_END = new Date().getFullYear() + 1;
 
@@ -16,6 +19,19 @@ export default function GestCalculator({ state, update, onClose }) {
   const c = state.egCalc;
   const set = (patch) => update({ egCalc: { ...c, ...patch } });
   const res = computeEG(c, state.fechaReporte);
+  const [showHitos, setShowHitos] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const hitos = res && res.ok ? buildHitos(state, res) : null;
+
+  const copiarHitos = async () => {
+    try {
+      await navigator.clipboard.writeText(buildHitosTexto(state, res));
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(false);
+    }
+  };
 
   const aplicar = () => {
     const patch = { egCalc: { ...c, activo: true } };
@@ -102,9 +118,41 @@ export default function GestCalculator({ state, update, onClose }) {
                   {hk.label}: {hk.value}
                 </div>
               ))}
+              <div className="mt-3">
+                <Button variant="secondary" onClick={() => setShowHitos((v) => !v)}>
+                  {showHitos ? "Ocultar hitos" : "Desplegar hitos del embarazo"}
+                </Button>
+              </div>
             </div>
           )}
         </div>
+
+        {/* Panel de hitos del embarazo */}
+        {showHitos && hitos && (
+          <div className="mt-3 rounded-xl border border-brand-200 bg-white p-4">
+            <div className="mb-2 flex flex-wrap gap-2">
+              <Button onClick={copiarHitos}>{copied ? "✓ ¡Copiado!" : "📋 Copiar información"}</Button>
+              <Button variant="secondary" onClick={() => printHitos(state, res)}>Guardar PDF</Button>
+              <Button variant="dark" onClick={() => generateHitosDocx(state, res)}>Guardar Word</Button>
+            </div>
+            <div className="max-h-80 overflow-y-auto rounded-lg bg-gray-50 p-3">
+              {hitos.paciente && <p className="text-sm font-semibold text-gray-800">Paciente: {hitos.paciente}</p>}
+              {hitos.eg && <p className="mb-2 text-xs text-gray-500">EG: {hitos.eg}{hitos.fpp ? ` · FPP: ${hitos.fpp}` : ""}</p>}
+              {hitos.items.map((it, i) => (
+                <div key={i} className="mb-2 border-b border-gray-100 pb-2">
+                  <div className="flex flex-wrap justify-between gap-2">
+                    <span className="text-sm font-semibold text-brand-800">{it.titulo}</span>
+                    <span className="text-sm font-semibold text-brand-600">{it.fecha}{it.superada ? " · ya superada" : ""}</span>
+                  </div>
+                  <p className="mt-1 text-xs leading-relaxed text-gray-600">{it.leyenda}</p>
+                </div>
+              ))}
+              <p className="mt-2 text-xs italic text-gray-600">{hitos.cierre}</p>
+              <p className="mt-2 text-xs font-semibold text-brand-700">{hitos.consultorio}</p>
+              <p className="text-xs text-gray-600">{hitos.contacto}</p>
+            </div>
+          </div>
+        )}
 
         <div className="mt-4 flex justify-between">
           <Button variant="ghost" onClick={() => set({ activo: false, fur: "", usFecha: "", usSemanas: "", usDias: "", fpp: "", manSemanas: "", manDias: "" })}>

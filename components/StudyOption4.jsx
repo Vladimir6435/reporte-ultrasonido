@@ -49,6 +49,7 @@ export default function StudyOption4({ state, update }) {
     <div>
       <Section title="Antropometría fetal" accent>
         <Grid cols={3}>
+          <Measurement label="Frecuencia cardíaca fetal" value={o.fcf} onChange={(v) => set({ fcf: v })} unit="lpm" />
           <Measurement label="DBP (diámetro biparietal)" value={o.dbp} onChange={(v) => set({ dbp: v })} unit="mm" />
           <Measurement label="CC (circunferencia cefálica)" value={o.cc} onChange={(v) => set({ cc: v })} unit="mm" />
           <Measurement label="CA (circunferencia abdominal)" value={o.ca} onChange={(v) => set({ ca: v })} unit="mm" />
