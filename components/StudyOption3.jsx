@@ -2,6 +2,7 @@
 
 import { Section, Field, Measurement, Segmented, TextField, TextArea, Checkbox, Grid } from "./ui";
 import { ESTADO_NANE, ANATOMIA_22_24, UBICACION_PLACENTA } from "@/lib/constants";
+import { calcPercentil, getGAWeeks, ESTANDARES } from "@/lib/percentile";
 
 const ECO_OPCIONES = [
   { value: "realizado_normal", label: "Realizado — Normal" },
@@ -14,6 +15,16 @@ export default function StudyOption3({ state, update }) {
   const set = (patch) => update({ op3: { ...o, ...patch } });
   const setAnat = (key, patch) =>
     set({ anatomia: { ...o.anatomia, [key]: { ...o.anatomia[key], ...patch } } });
+
+  const ga = getGAWeeks(state);
+  const setPeso = (v) => {
+    const p = calcPercentil(v, ga, state.percentilEstandar);
+    set({ peso: v, ...(p ? { pesoPercentil: p.display } : {}) });
+  };
+  const setEstandar = (v) => {
+    const p = calcPercentil(o.peso, ga, v);
+    update({ percentilEstandar: v, op3: { ...o, ...(p ? { pesoPercentil: p.display } : {}) } });
+  };
 
   return (
     <div>
@@ -96,8 +107,12 @@ export default function StudyOption3({ state, update }) {
             <Measurement label="CC" value={o.cc} onChange={(v) => set({ cc: v })} unit="mm" />
             <Measurement label="CA" value={o.ca} onChange={(v) => set({ ca: v })} unit="mm" />
             <Measurement label="LF" value={o.lf} onChange={(v) => set({ lf: v })} unit="mm" />
-            <Measurement label="Peso fetal estimado" value={o.peso} onChange={(v) => set({ peso: v })} unit="g" />
-            <Measurement label="Percentil de peso" value={o.pesoPercentil} onChange={(v) => set({ pesoPercentil: v })} unit="p" inputType="text" />
+            <Measurement label="Peso fetal estimado" value={o.peso} onChange={setPeso} unit="g" />
+            <Measurement label="Percentil de peso" value={o.pesoPercentil} onChange={(v) => set({ pesoPercentil: v })} unit="percentil" inputType="text" />
+            <div className="md:col-span-3 flex flex-wrap items-center gap-3">
+              <span className="text-sm font-medium text-gray-700">Estándar:</span>
+              <Segmented value={state.percentilEstandar} onChange={setEstandar} options={ESTANDARES} size="sm" />
+            </div>
           </Grid>
         )}
       </Section>

@@ -3,6 +3,7 @@
 import { Section, Field, Measurement, Segmented, Checkbox, Grid, TextField, TextArea } from "./ui";
 import { UBICACION_PLACENTA, LIQUIDO_AMNIOTICO } from "@/lib/constants";
 import { classifyRCIU } from "@/lib/calculations";
+import { calcPercentil, getGAWeeks, ESTANDARES } from "@/lib/percentile";
 
 // Fila de Doppler con dos casillas: IP y percentil, más "no se requiere".
 function DopplerRow({ label, ip, onIp, p, onP, nm, onNm, extra }) {
@@ -31,6 +32,22 @@ export default function StudyOption4({ state, update }) {
   const o = state.op4;
   const set = (patch) => update({ op4: { ...o, ...patch } });
 
+  const ga = getGAWeeks(state);
+  // Autocompleta el percentil al ingresar el peso.
+  const setPeso = (v) => {
+    const p = calcPercentil(v, ga, state.percentilEstandar);
+    set({ peso: v, ...(p ? { pesoPercentil: p.display } : {}) });
+  };
+  // Cambia el estándar y recalcula con el peso actual.
+  const setEstandar = (v) => {
+    const p = calcPercentil(o.peso, ga, v);
+    update({ percentilEstandar: v, op4: { ...o, ...(p ? { pesoPercentil: p.display } : {}) } });
+  };
+  const recalc = () => {
+    const p = calcPercentil(o.peso, ga, state.percentilEstandar);
+    if (p) set({ pesoPercentil: p.display });
+  };
+
   const rciu = o.rciuEnabled
     ? classifyRCIU({
         pesoPercentil: o.pesoPercentil,
@@ -54,9 +71,24 @@ export default function StudyOption4({ state, update }) {
           <Measurement label="CC (circunferencia cefálica)" value={o.cc} onChange={(v) => set({ cc: v })} unit="mm" />
           <Measurement label="CA (circunferencia abdominal)" value={o.ca} onChange={(v) => set({ ca: v })} unit="mm" />
           <Measurement label="LF (longitud femoral)" value={o.lf} onChange={(v) => set({ lf: v })} unit="mm" />
-          <Measurement label="Peso fetal estimado" value={o.peso} onChange={(v) => set({ peso: v })} unit="g" />
-          <Measurement label="Percentil de peso" value={o.pesoPercentil} onChange={(v) => set({ pesoPercentil: v })} unit="p" inputType="text" />
+          <Measurement label="Peso fetal estimado" value={o.peso} onChange={setPeso} unit="g" />
+          <Measurement label="Percentil de peso" value={o.pesoPercentil} onChange={(v) => set({ pesoPercentil: v })} unit="percentil" inputType="text" />
         </Grid>
+
+        <div className="mt-2 rounded-lg bg-gray-50 p-3">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="text-sm font-medium text-gray-700">Estándar de percentil:</span>
+            <Segmented value={state.percentilEstandar} onChange={setEstandar} options={ESTANDARES} size="sm" />
+            <button type="button" onClick={recalc} className="rounded-md border border-brand-600 px-3 py-1 text-xs font-semibold text-brand-700 hover:bg-brand-50">
+              Recalcular percentil
+            </button>
+          </div>
+          <p className="mt-1 text-xs text-gray-500">
+            {ga != null
+              ? `Calculado con edad gestacional ${Math.floor(ga)} sem ${Math.round((ga - Math.floor(ga)) * 7)} d. El percentil se autocompleta al ingresar el peso y es editable.`
+              : "Ingrese la edad gestacional (calculadora o historia) para calcular el percentil automáticamente."}
+          </p>
+        </div>
       </Section>
 
       <Section title="Presentación, placenta y líquido amniótico">
