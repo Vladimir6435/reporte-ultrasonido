@@ -11,6 +11,7 @@ const YEAR_END = new Date().getFullYear() + 1;
 const METODOS = [
   { value: "fur", label: "Última regla" },
   { value: "us", label: "Ultrasonido previo" },
+  { value: "bpd", label: "Diámetro biparietal" },
   { value: "fpp", label: "Fecha probable de parto" },
   { value: "manual", label: "Manual" },
 ];
@@ -62,9 +63,34 @@ export default function GestCalculator({ state, update, onClose }) {
         </Field>
 
         {c.metodo === "fur" && (
-          <Field label="Fecha de última regla">
-            <DateSelect value={c.fur} onChange={(v) => set({ fur: v })} yearStart={2020} yearEnd={YEAR_END} />
-          </Field>
+          <>
+            <Field label="Fecha de última regla">
+              <DateSelect value={c.fur} onChange={(v) => set({ fur: v })} yearStart={2020} yearEnd={YEAR_END} />
+            </Field>
+            <Field label="Confiabilidad de la fecha">
+              <Segmented
+                value={c.furConfiable}
+                onChange={(v) => set({ furConfiable: v })}
+                options={[
+                  { value: "confiable", label: "Confiable" },
+                  { value: "no_confiable", label: "No confiable" },
+                ]}
+                size="sm"
+              />
+            </Field>
+          </>
+        )}
+
+        {c.metodo === "bpd" && (
+          <>
+            <Field label="Diámetro biparietal (DBP)">
+              <TextField type="number" value={c.bpd} onChange={(v) => set({ bpd: v })} suffix="mm" placeholder="Ej. 21" />
+            </Field>
+            <Field label="Fecha de la medición del DBP">
+              <DateSelect value={c.bpdFecha} onChange={(v) => set({ bpdFecha: v })} yearStart={2020} yearEnd={YEAR_END} />
+            </Field>
+            <p className="-mt-2 mb-3 text-xs text-gray-400">Hadlock 1984 — estándar universal de datación por biometría.</p>
+          </>
         )}
 
         {c.metodo === "us" && (
@@ -155,7 +181,7 @@ export default function GestCalculator({ state, update, onClose }) {
         )}
 
         <div className="mt-4 flex justify-between">
-          <Button variant="ghost" onClick={() => set({ activo: false, fur: "", usFecha: "", usSemanas: "", usDias: "", fpp: "", manSemanas: "", manDias: "" })}>
+          <Button variant="ghost" onClick={() => set({ activo: false, fur: "", furConfiable: "confiable", usFecha: "", usSemanas: "", usDias: "", fpp: "", manSemanas: "", manDias: "", bpd: "", bpdFecha: "" })}>
             Limpiar
           </Button>
           <div className="flex gap-2">
