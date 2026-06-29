@@ -2,6 +2,7 @@
 
 import { Section, Field, Measurement, Segmented, TextField, Grid } from "./ui";
 import { PRESENTE_AUSENTE_NM, ESTADO_PAU, ANATOMIA_11_14 } from "@/lib/constants";
+import CrlGaSync from "./CrlGaSync";
 
 const NORMAL_ANORMAL_NM = [
   { value: "normal", label: "Normal" },
@@ -18,8 +19,9 @@ export default function StudyOption2({ state, update }) {
   return (
     <div>
       <Section title="Tamizaje 11–14 semanas — Marcadores" accent>
+        <Measurement label="Longitud cefalocaudal (CRL)" value={o.crl} onChange={(v) => set({ crl: v })} unit="mm" />
+        <CrlGaSync crl={o.crl} state={state} update={update} />
         <Grid cols={2}>
-          <Measurement label="Longitud cefalocaudal (CRL)" value={o.crl} onChange={(v) => set({ crl: v })} unit="mm" />
           <Measurement
             label="Translucencia nucal (TN)"
             value={o.tn}

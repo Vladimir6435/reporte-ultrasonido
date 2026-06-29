@@ -181,7 +181,7 @@ export default function GestCalculator({ state, update, onClose }) {
         )}
 
         <div className="mt-4 flex justify-between">
-          <Button variant="ghost" onClick={() => set({ activo: false, fur: "", furConfiable: "confiable", usFecha: "", usSemanas: "", usDias: "", fpp: "", manSemanas: "", manDias: "", bpd: "", bpdFecha: "" })}>
+          <Button variant="ghost" onClick={() => set({ activo: false, fur: "", furConfiable: "confiable", usFecha: "", usSemanas: "", usDias: "", fpp: "", manSemanas: "", manDias: "", bpd: "", bpdFecha: "", crl: "", crlFecha: "" })}>
             Limpiar
           </Button>
           <div className="flex gap-2">

@@ -2,7 +2,8 @@
 
 import { Section, Field, Measurement, Segmented, Grid } from "./ui";
 import { TIPO_EMBARAZO, CORIONICIDAD, PRESENTE_AUSENTE_NM } from "@/lib/constants";
-import { calcEDD, gaFromCRL, daysToWeeksString, formatDate, parseDate } from "@/lib/calculations";
+import { calcEDD, formatDate, parseDate } from "@/lib/calculations";
+import CrlGaSync from "./CrlGaSync";
 
 export default function StudyOption1({ state, update }) {
   const o = state.op1;
@@ -10,7 +11,6 @@ export default function StudyOption1({ state, update }) {
 
   // FPP calculada a partir de la EG ingresada y la fecha de elaboración del reporte
   const fpp = calcEDD(state.fechaReporte, o.egSemanas, o.egDias);
-  const crlGaDays = gaFromCRL(o.crl);
 
   return (
     <div>
@@ -33,11 +33,12 @@ export default function StudyOption1({ state, update }) {
           </Field>
         </Grid>
 
-        {crlGaDays && (
-          <p className="mb-3 text-xs text-gray-500">
-            Sugerencia por LCC (Robinson): {daysToWeeksString(crlGaDays)} — puede usarla como referencia.
-          </p>
-        )}
+        <CrlGaSync
+          crl={o.crl}
+          state={state}
+          update={update}
+          extra={(sem, dias) => ({ op1: { ...o, egSemanas: String(sem), egDias: String(dias) } })}
+        />
 
         {fpp && (
           <div className="rounded-lg bg-brand-50 px-4 py-3 text-sm text-brand-800">
