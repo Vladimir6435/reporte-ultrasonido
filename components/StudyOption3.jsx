@@ -3,6 +3,7 @@
 import { Section, Field, Measurement, Segmented, TextField, TextArea, Checkbox, Grid } from "./ui";
 import { ESTADO_NANE, ANATOMIA_22_24, UBICACION_PLACENTA } from "@/lib/constants";
 import { calcPercentil, getGAWeeks, ESTANDARES } from "@/lib/percentile";
+import AmnioticFluidField from "./AmnioticFluidField";
 
 const ECO_OPCIONES = [
   { value: "realizado_normal", label: "Realizado — Normal" },
@@ -81,6 +82,7 @@ export default function StudyOption3({ state, update }) {
             <Segmented value={o.ubicacionPlacenta} onChange={(v) => set({ ubicacionPlacenta: v })} options={UBICACION_PLACENTA} size="sm" />
           </Field>
         </Grid>
+        <AmnioticFluidField cualitativo={o.liquidoAmniotico} tipo={o.liquidoTipo} valor={o.liquidoValor} onChange={set} />
       </Section>
 
       <Section title="Tamizaje de preeclampsia">

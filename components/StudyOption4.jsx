@@ -1,7 +1,8 @@
 "use client";
 
 import { Section, Field, Measurement, Segmented, Checkbox, Grid, TextField, TextArea } from "./ui";
-import { UBICACION_PLACENTA, LIQUIDO_AMNIOTICO } from "@/lib/constants";
+import { UBICACION_PLACENTA } from "@/lib/constants";
+import AmnioticFluidField from "./AmnioticFluidField";
 import { classifyRCIU } from "@/lib/calculations";
 import { calcPercentil, getGAWeeks, ESTANDARES } from "@/lib/percentile";
 
@@ -108,11 +109,9 @@ export default function StudyOption4({ state, update }) {
           <Field label="Ubicación placentaria">
             <Segmented value={o.ubicacionPlacenta} onChange={(v) => set({ ubicacionPlacenta: v })} options={UBICACION_PLACENTA} size="sm" />
           </Field>
-          <Field label="Líquido amniótico">
-            <Segmented value={o.liquidoAmniotico} onChange={(v) => set({ liquidoAmniotico: v })} options={LIQUIDO_AMNIOTICO} size="sm" />
-          </Field>
-          <Measurement label="ILA / bolsillo mayor (opcional)" value={o.ilaValor} onChange={(v) => set({ ilaValor: v })} unit="cm" inputType="text" />
         </Grid>
+
+        <AmnioticFluidField cualitativo={o.liquidoAmniotico} tipo={o.liquidoTipo} valor={o.liquidoValor} onChange={set} />
 
         <Field label="Placenta">
           <Checkbox checked={o.placentaAnormal} onChange={(v) => set({ placentaAnormal: v })} label="Placenta anormal" />
